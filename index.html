@@ -9,20 +9,20 @@
     <!-- React & ReactDOM CDN -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-    <!-- Babel for JSX -->
+    <!-- Babel for JSX compilation -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <style>
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .animate-fade-in { animation: fadeIn 0.2s ease-out forwards; }
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         .toggle-checkbox:checked { right: 0; border-color: #facc15; }
         .toggle-checkbox:checked + .toggle-label { background-color: #facc15; }
     </style>
 </head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
-    <div id="root"></div>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen m-0 p-0 overflow-x-hidden">
+    <div id="root" class="w-full h-full flex items-center justify-center"></div>
 
     <script type="text/babel">
         const { useState, useEffect } = React;
@@ -77,7 +77,7 @@
             logicType: 'default',
             notificationsEnabled: true,
             theme: 'light',
-            scale: 0.9,
+            scale: 1.0,
             navColor: 'sky',
             showLotto: false,
           });
@@ -146,7 +146,7 @@
               })));
               if (!silent) showToast("최신 동행복권 데이터 동기화 완료!");
             } catch (e) {
-              if (!silent) showToast("데이터 동기화 실패 (네트워크 오류)");
+              if (!silent) showToast("데이터 동기화 실패");
             } finally {
               setIsFetching(false);
             }
@@ -166,9 +166,9 @@
             const colors = ['bg-red-600', 'bg-orange-500', 'bg-yellow-400', 'bg-lime-400', 'bg-green-500'];
             const activeColor = colors[meta.idx];
             return (
-              <div className={`flex flex-col items-center justify-center p-1.5 rounded-lg border w-[72px] flex-shrink-0 ${tColor('border-gray-200 bg-gray-50', 'border-gray-700 bg-gray-800')}`}>
+              <div className={`flex flex-col items-center justify-center p-2 rounded-xl border w-20 flex-shrink-0 ${tColor('border-gray-200 bg-gray-50', 'border-gray-700 bg-gray-800')}`}>
                 <div className={`w-4 h-4 rounded-full mb-1 ${activeColor} shadow-[0_0_8px_currentColor]`} />
-                <span className={`text-[10px] font-black ${meta.textCol} text-center leading-tight whitespace-nowrap`}>{meta.text}</span>
+                <span className={`text-[11px] font-black ${meta.textCol} text-center leading-tight whitespace-nowrap`}>{meta.text}</span>
               </div>
             );
           };
@@ -176,8 +176,8 @@
           const SpittoCard = ({ item }) => {
             const score = calculateSignal(item);
             return (
-              <div className={`rounded-xl p-2.5 mb-2 flex items-center justify-between shadow-sm border ${tColor('bg-white border-gray-100', 'bg-gray-800 border-gray-700')}`}>
-                <div className={`relative w-12 h-14 rounded overflow-hidden flex-shrink-0 border ${tColor('border-gray-200 bg-gray-100', 'border-gray-700 bg-gray-800')}`}>
+              <div className={`rounded-2xl p-4 mb-3 flex items-center justify-between shadow-sm border transition hover:shadow-md ${tColor('bg-white border-gray-100', 'bg-gray-800 border-gray-700')}`}>
+                <div className={`relative w-14 h-16 rounded-xl overflow-hidden flex-shrink-0 border ${tColor('border-gray-200 bg-gray-100', 'border-gray-700 bg-gray-800')}`}>
                   <img 
                     src={item.imgSrc} 
                     alt={`${item.type} ${item.round}회`} 
@@ -185,27 +185,27 @@
                     onError={(e) => { e.target.style.display = 'none'; }} 
                   />
                   <div className={`w-full h-full absolute inset-0 bg-gradient-to-br ${item.color} flex flex-col items-center justify-center text-white z-0`}>
-                    <span className="text-[8px] opacity-80 font-medium">{item.type}</span>
-                    <span className="text-sm font-black text-center leading-none mt-1">{item.round}</span>
+                    <span className="text-[9px] opacity-80 font-medium">{item.type}</span>
+                    <span className="text-base font-black text-center leading-none mt-1">{item.round}</span>
                   </div>
                 </div>
                 
-                <div className="flex-1 px-3 flex flex-col justify-center">
-                  <div className="flex items-start justify-between mb-1">
-                    <h3 className={`font-black text-sm tracking-tight ${tColor('text-gray-800', 'text-gray-100')}`}>
-                      {item.type} <span className="font-bold text-[10px] opacity-60 ml-1">{item.round}회</span>
+                <div className="flex-1 px-4 flex flex-col justify-center">
+                  <div className="flex items-start justify-between mb-1.5">
+                    <h3 className={`font-black text-base tracking-tight ${tColor('text-gray-800', 'text-gray-100')}`}>
+                      {item.type} <span className="font-bold text-xs opacity-60 ml-1">{item.round}회</span>
                     </h3>
                     <div className="flex flex-col items-end">
-                      <span className="text-[10px] font-bold text-red-500">1등 {item.remaining1st}/{item.total1st}매</span>
+                      <span className="text-xs font-bold text-red-500">1등 {item.remaining1st}/{item.total1st}매</span>
                       {settings.logicType === 'complex' && (
-                        <span className="text-[9px] font-bold text-blue-500">2등 {item.remaining2nd}매</span>
+                        <span className="text-[10px] font-bold text-blue-500">2등 {item.remaining2nd}매</span>
                       )}
                     </div>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-1.5 mb-1 dark:bg-gray-700">
-                    <div className="bg-blue-500 h-1.5 rounded-full transition-all duration-500" style={{ width: `${item.stockRate}%` }}></div>
+                  <div className="w-full bg-gray-200 rounded-full h-2 mb-1.5 dark:bg-gray-700">
+                    <div className="bg-blue-500 h-2 rounded-full transition-all duration-500" style={{ width: `${item.stockRate}%` }}></div>
                   </div>
-                  <p className={`text-[10px] text-right ${tColor('text-gray-500', 'text-gray-400')}`}>입고율 <strong className={tColor('text-gray-800', 'text-gray-200')}>{item.stockRate}%</strong></p>
+                  <p className={`text-xs text-right ${tColor('text-gray-500', 'text-gray-400')}`}>입고율 <strong className={tColor('text-gray-800', 'text-gray-200')}>{item.stockRate}%</strong></p>
                 </div>
 
                 <TrafficLight score={score} />
@@ -214,17 +214,17 @@
           };
 
           const HomeView = () => (
-            <div className="p-3 animate-fade-in h-full flex flex-col">
+            <div className="p-4 animate-fade-in h-full flex flex-col max-w-2xl mx-auto w-full">
               <div className="flex justify-between items-center mb-3">
                 <div>
-                  <h2 className={`text-lg font-black tracking-tight ${tColor('text-gray-800', 'text-white')}`}>현재 스피또 상태</h2>
+                  <h2 className={`text-xl font-black tracking-tight ${tColor('text-gray-800', 'text-white')}`}>현재 스피또 상태</h2>
                 </div>
-                <button onClick={() => fetchRealData(false)} className={`p-1.5 rounded-md flex items-center text-xs font-bold ${isFetching ? 'animate-pulse' : ''} ${tColor('bg-blue-50 text-blue-600', 'bg-blue-900/30 text-blue-400')}`}>
-                  <RefreshIcon /><span className="ml-1">동기화</span>
+                <button onClick={() => fetchRealData(false)} className={`px-3 py-1.5 rounded-lg flex items-center text-xs font-bold shadow-sm ${isFetching ? 'animate-pulse' : ''} ${tColor('bg-blue-50 text-blue-600', 'bg-blue-900/40 text-blue-400')}`}>
+                  <RefreshIcon /><span className="ml-1.5">동기화</span>
                 </button>
               </div>
 
-              <div className={`flex justify-between items-center p-2 rounded-lg mb-3 border text-[9px] font-bold ${tColor('bg-gray-50 border-gray-200 text-gray-600', 'bg-gray-800 border-gray-700 text-gray-300')}`}>
+              <div className={`flex justify-between items-center p-3 rounded-xl mb-4 border text-[11px] font-bold ${tColor('bg-gray-50 border-gray-200 text-gray-600', 'bg-gray-800 border-gray-700 text-gray-300')}`}>
                 <span className="text-red-500">● 1:절대안삼</span>
                 <span className="text-orange-500">● 2:안삼</span>
                 <span className="text-yellow-500">● 3:보통</span>
@@ -236,19 +236,19 @@
                 {spittoData.map(item => <SpittoCard key={item.id} item={item} />)}
                 
                 {settings.showLotto && (
-                  <div className={`mt-4 mb-2 p-3 rounded-xl border shadow-sm flex flex-col items-center ${tColor('bg-white border-gray-100', 'bg-gray-800 border-gray-700')}`}>
+                  <div className={`mt-6 mb-4 p-4 rounded-2xl border shadow-sm flex flex-col items-center ${tColor('bg-white border-gray-100', 'bg-gray-800 border-gray-700')}`}>
                     <div className="flex items-center space-x-2 mb-3">
-                      <span className={`text-xs font-bold ${tColor('text-gray-500', 'text-gray-400')}`}>동행복권 1등 당첨결과</span>
-                      <span className={`text-sm font-black ${tColor('text-blue-600', 'text-blue-400')}`}>{lottoData.round}회</span>
+                      <span className={`text-sm font-bold ${tColor('text-gray-500', 'text-gray-400')}`}>동행복권 1등 당첨결과</span>
+                      <span className={`text-base font-black ${tColor('text-blue-600', 'text-blue-400')}`}>{lottoData.round}회</span>
                     </div>
-                    <div className="flex space-x-1.5 items-center">
+                    <div className="flex space-x-2 items-center">
                       {lottoData.numbers.map((n, i) => (
-                        <div key={i} className={`w-7 h-7 rounded-full text-white font-bold flex justify-center items-center text-[11px] shadow-md ${getLottoColor(n)}`}>
+                        <div key={i} className={`w-8 h-8 rounded-full text-white font-bold flex justify-center items-center text-xs shadow-md ${getLottoColor(n)}`}>
                           {n}
                         </div>
                       ))}
-                      <span className={`text-lg font-bold mx-1 ${tColor('text-gray-400', 'text-gray-600')}`}>+</span>
-                      <div className={`w-7 h-7 rounded-full text-white font-bold flex justify-center items-center text-[11px] shadow-md ${getLottoColor(lottoData.bonus)}`}>
+                      <span className={`text-xl font-bold mx-1 ${tColor('text-gray-400', 'text-gray-600')}`}>+</span>
+                      <div className={`w-8 h-8 rounded-full text-white font-bold flex justify-center items-center text-xs shadow-md ${getLottoColor(lottoData.bonus)}`}>
                         {lottoData.bonus}
                       </div>
                     </div>
@@ -259,22 +259,22 @@
           );
 
           const SettingsView = () => (
-            <div className={`p-4 animate-fade-in h-full ${tColor('bg-gray-50', 'bg-gray-900')}`}>
-              <h2 className={`text-lg font-black mb-4 ${tColor('text-gray-800', 'text-white')}`}>앱 설정</h2>
+            <div className={`p-4 animate-fade-in h-full max-w-2xl mx-auto w-full overflow-y-auto custom-scrollbar ${tColor('bg-gray-50', 'bg-gray-900')}`}>
+              <h2 className={`text-xl font-black mb-4 ${tColor('text-gray-800', 'text-white')}`}>앱 설정</h2>
               
-              <div className={`rounded-xl shadow-sm border p-3 mb-4 space-y-4 ${tColor('bg-white border-gray-100', 'bg-gray-800 border-gray-700')}`}>
+              <div className={`rounded-2xl shadow-sm border p-4 mb-4 space-y-4 ${tColor('bg-white border-gray-100', 'bg-gray-800 border-gray-700')}`}>
                 <div className="flex justify-between items-center">
                   <span className={`text-sm font-bold ${tColor('text-gray-800', 'text-gray-200')}`}>다크 모드 (블랙 테마)</span>
                   <input type="checkbox" className="toggle-checkbox" checked={settings.theme === 'dark'} onChange={() => setSettings({...settings, theme: settings.theme === 'dark' ? 'light' : 'dark'})} />
                 </div>
                 
                 <div>
-                  <div className="flex justify-between mb-1">
-                    <span className={`text-sm font-bold ${tColor('text-gray-800', 'text-gray-200')}`}>화면 크기 (비율)</span>
+                  <div className="flex justify-between mb-1.5">
+                    <span className={`text-sm font-bold ${tColor('text-gray-800', 'text-gray-200')}`}>화면 확대 / 축소 비율</span>
                     <span className={`text-xs font-bold ${tColor('text-blue-600', 'text-blue-400')}`}>{Math.round(settings.scale * 100)}%</span>
                   </div>
                   <input 
-                    type="range" min="0.75" max="1.1" step="0.05" 
+                    type="range" min="0.8" max="1.2" step="0.05" 
                     value={settings.scale}
                     onChange={(e) => setSettings({...settings, scale: parseFloat(e.target.value)})}
                     className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
@@ -283,18 +283,18 @@
               </div>
 
               <h3 className={`text-xs font-bold mb-2 ml-1 ${tColor('text-gray-500', 'text-gray-400')}`}>화면 및 기타 설정</h3>
-              <div className={`rounded-xl shadow-sm border p-3 mb-4 space-y-4 ${tColor('bg-white border-gray-100', 'bg-gray-800 border-gray-700')}`}>
+              <div className={`rounded-2xl shadow-sm border p-4 mb-4 space-y-4 ${tColor('bg-white border-gray-100', 'bg-gray-800 border-gray-700')}`}>
                 <div>
-                  <span className={`text-sm font-bold block mb-2 ${tColor('text-gray-800', 'text-gray-200')}`}>하단 네비게이션 색상</span>
-                  <div className="flex flex-wrap gap-2">
+                  <span className={`text-sm font-bold block mb-2 ${tColor('text-gray-800', 'text-gray-200')}`}>하단 네비게이션 테마 색상</span>
+                  <div className="flex flex-wrap gap-2.5">
                     {NAV_COLORS.map(c => (
                       <button 
                         key={c.id} 
                         onClick={() => setSettings({...settings, navColor: c.id})} 
-                        className={`w-7 h-7 rounded-full shadow-sm flex justify-center items-center ${c.light.split(' ')[0]} ${settings.navColor === c.id ? 'ring-2 ring-offset-1 ' + tColor('ring-gray-800', 'ring-gray-300') : ''}`}
+                        className={`w-8 h-8 rounded-full shadow-sm flex justify-center items-center ${c.light.split(' ')[0]} ${settings.navColor === c.id ? 'ring-2 ring-offset-2 ' + tColor('ring-gray-800', 'ring-gray-300') : ''}`}
                         title={c.label}
                       >
-                        {settings.navColor === c.id && <span className={`${tColor(c.textLight, c.textDark)} text-[10px] font-black`}>✓</span>}
+                        {settings.navColor === c.id && <span className={`${tColor(c.textLight, c.textDark)} text-xs font-black`}>✓</span>}
                       </button>
                     ))}
                   </div>
@@ -305,7 +305,7 @@
                 <div className="flex justify-between items-center">
                   <div className="flex flex-col">
                     <span className={`text-sm font-bold ${tColor('text-gray-800', 'text-gray-200')}`}>로또 1등 번호 표시</span>
-                    <span className={`text-[10px] mt-0.5 ${tColor('text-gray-500', 'text-gray-400')}`}>홈 화면 하단에 최근 로또 추첨결과 표시</span>
+                    <span className={`text-[11px] mt-0.5 ${tColor('text-gray-500', 'text-gray-400')}`}>홈 화면 하단에 최근 로또 추첨결과 표시</span>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
                     <input type="checkbox" className="sr-only peer" checked={settings.showLotto} onChange={() => setSettings({...settings, showLotto: !settings.showLotto})} />
@@ -315,17 +315,17 @@
               </div>
 
               <h3 className={`text-xs font-bold mb-2 ml-1 ${tColor('text-gray-500', 'text-gray-400')}`}>신호등 로직 설정</h3>
-              <div className={`rounded-xl shadow-sm border overflow-hidden text-sm ${tColor('bg-white border-gray-100', 'bg-gray-800 border-gray-700')}`}>
+              <div className={`rounded-2xl shadow-sm border overflow-hidden text-sm mb-8 ${tColor('bg-white border-gray-100', 'bg-gray-800 border-gray-700')}`}>
                 {[
                   { id: 'default', title: '기본 로직 (권장)', desc: '남은장수/판매입고율 공식 적용' },
                   { id: 'near80', title: '입고율 임박 로직', desc: '입고율 80~90% 근접 시 가점 부여' },
                   { id: 'complex', title: '복합 확률 로직', desc: '2등 잔여수량과 전체 확률 종합 계산' }
                 ].map(logic => (
-                  <label key={logic.id} className={`flex items-start p-3 border-b cursor-pointer transition ${tColor('border-gray-50 hover:bg-gray-50', 'border-gray-700 hover:bg-gray-700')}`}>
+                  <label key={logic.id} className={`flex items-start p-3.5 border-b cursor-pointer transition ${tColor('border-gray-50 hover:bg-gray-50', 'border-gray-700 hover:bg-gray-700')}`}>
                     <input type="radio" name="logic" className="mt-1" checked={settings.logicType === logic.id} onChange={() => setSettings({...settings, logicType: logic.id})} />
                     <div className="ml-3">
                       <h4 className={`font-bold ${tColor('text-gray-800', 'text-gray-200')}`}>{logic.title}</h4>
-                      <p className={`text-[10px] mt-0.5 ${tColor('text-gray-500', 'text-gray-400')}`}>{logic.desc}</p>
+                      <p className={`text-xs mt-0.5 ${tColor('text-gray-500', 'text-gray-400')}`}>{logic.desc}</p>
                     </div>
                   </label>
                 ))}
@@ -334,46 +334,46 @@
           );
 
           const MapView = () => (
-            <div className="flex flex-col h-full animate-fade-in relative">
+            <div className="flex flex-col h-full animate-fade-in relative max-w-2xl mx-auto w-full">
               <div className={`p-3 shadow-sm z-10 flex space-x-2 ${tColor('bg-white', 'bg-gray-800')}`}>
-                <input type="text" placeholder="지역 설정 (예: 강남구)" className={`flex-1 border-none rounded-lg px-3 py-2 text-sm outline-none ${tColor('bg-gray-100 text-gray-800', 'bg-gray-700 text-white')}`} value={searchLocation} onChange={(e) => setSearchLocation(e.target.value)} />
-                <button onClick={() => { setMapLocation(searchLocation || mapLocation); showToast(`'${searchLocation || mapLocation}' 주변 검색 완료`); }} className={`px-3 rounded-lg font-bold text-xs transition ${tColor('bg-gray-800 text-white', 'bg-gray-600 text-white')}`}>검색</button>
+                <input type="text" placeholder="지역 설정 (예: 평택시)" className={`flex-1 border-none rounded-xl px-4 py-2.5 text-sm outline-none ${tColor('bg-gray-100 text-gray-800', 'bg-gray-700 text-white')}`} value={searchLocation} onChange={(e) => setSearchLocation(e.target.value)} />
+                <button onClick={() => { setMapLocation(searchLocation || mapLocation); showToast(`'${searchLocation || mapLocation}' 주변 검색 완료`); }} className={`px-4 rounded-xl font-bold text-xs transition ${tColor('bg-gray-800 text-white', 'bg-gray-600 text-white')}`}>검색</button>
               </div>
               <div className={`flex-1 relative overflow-hidden flex items-center justify-center ${tColor('bg-blue-50', 'bg-blue-900/20')}`}>
-                <p className={`text-sm font-bold opacity-50 ${tColor('text-blue-800', 'text-blue-300')}`}>{mapLocation} 주변 판매점 지도 (목업)</p>
-                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-3xl">🍀</div>
+                <p className={`text-sm font-bold opacity-60 ${tColor('text-blue-800', 'text-blue-300')}`}>{mapLocation} 주변 판매점 지도 (목업)</p>
+                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-4xl animate-bounce">🍀</div>
               </div>
             </div>
           );
 
           const WidgetView = () => (
-            <div className={`p-4 h-full animate-fade-in ${tColor('bg-gray-50', 'bg-gray-900')}`}>
-              <h2 className={`text-lg font-black mb-4 ${tColor('text-gray-800', 'text-white')}`}>위젯 미리보기</h2>
+            <div className={`p-4 h-full animate-fade-in max-w-2xl mx-auto w-full overflow-y-auto custom-scrollbar ${tColor('bg-gray-50', 'bg-gray-900')}`}>
+              <h2 className={`text-xl font-black mb-4 ${tColor('text-gray-800', 'text-white')}`}>위젯 미리보기</h2>
               <div className="flex flex-col space-y-4">
-                <div className={`w-32 h-32 rounded-3xl shadow-lg border p-4 flex flex-col justify-between ${tColor('bg-white border-gray-100', 'bg-gray-800 border-gray-700')}`}>
+                <div className={`w-36 h-36 rounded-3xl shadow-lg border p-4 flex flex-col justify-between ${tColor('bg-white border-gray-100', 'bg-gray-800 border-gray-700')}`}>
                    <div className="flex justify-between items-start">
-                     <AppLogo size="w-8 h-8" />
+                     <AppLogo size="w-9 h-9" />
                      <TrafficLight score={calculateSignal(spittoData[0])} />
                    </div>
                    <div>
-                     <p className={`text-[10px] font-bold ${tColor('text-gray-500', 'text-gray-400')}`}>추천 복권</p>
-                     <p className={`text-xs font-black leading-tight mt-0.5 ${tColor('text-gray-800', 'text-white')}`}>스피또 2000<br/>69회차</p>
+                     <p className={`text-xs font-bold ${tColor('text-gray-500', 'text-gray-400')}`}>추천 복권</p>
+                     <p className={`text-sm font-black leading-tight mt-0.5 ${tColor('text-gray-800', 'text-white')}`}>스피또 2000<br/>69회차</p>
                    </div>
                 </div>
                 
-                <div className={`w-full h-24 rounded-3xl shadow-lg border p-4 flex justify-between items-center ${tColor('bg-white border-gray-100', 'bg-gray-800 border-gray-700')}`}>
+                <div className={`w-full h-28 rounded-3xl shadow-lg border p-5 flex justify-between items-center ${tColor('bg-white border-gray-100', 'bg-gray-800 border-gray-700')}`}>
                    <div className="flex flex-col justify-center h-full">
                      <div className="flex items-center space-x-2 mb-1">
-                       <AppLogo size="w-6 h-6" />
-                       <span className={`text-[10px] font-bold ${tColor('text-gray-500', 'text-gray-400')}`}>확률 뚫고 1등</span>
+                       <AppLogo size="w-7 h-7" />
+                       <span className={`text-xs font-bold ${tColor('text-gray-500', 'text-gray-400')}`}>확률 뚫고 1등</span>
                      </div>
-                     <p className={`text-sm font-black mt-1 ${tColor('text-gray-800', 'text-white')}`}>오늘의 추천 복권</p>
+                     <p className={`text-base font-black mt-1 ${tColor('text-gray-800', 'text-white')}`}>오늘의 추천 복권</p>
                    </div>
                    
-                   <div className={`flex items-center rounded-xl p-2 border ${tColor('bg-gray-50 border-gray-100', 'bg-gray-700/50 border-gray-600')}`}>
-                     <div className="mr-3 text-right">
-                        <p className={`text-[11px] font-black ${tColor('text-gray-800', 'text-white')}`}>{spittoData[0].type}</p>
-                        <p className={`text-[10px] ${tColor('text-gray-500', 'text-gray-400')}`}>{spittoData[0].round}회</p>
+                   <div className={`flex items-center rounded-2xl p-3 border ${tColor('bg-gray-50 border-gray-100', 'bg-gray-700/50 border-gray-600')}`}>
+                     <div className="mr-4 text-right">
+                        <p className={`text-xs font-black ${tColor('text-gray-800', 'text-white')}`}>{spittoData[0].type}</p>
+                        <p className={`text-[11px] ${tColor('text-gray-500', 'text-gray-400')}`}>{spittoData[0].round}회</p>
                      </div>
                      <TrafficLight score={calculateSignal(spittoData[0])} />
                    </div>
@@ -385,33 +385,33 @@
           const curNavColor = NAV_COLORS.find(c => c.id === settings.navColor) || NAV_COLORS[0];
 
           return (
-            <div className={`min-h-screen w-full flex items-center justify-center ${tColor('bg-gray-200', 'bg-black')} transition-colors duration-300`}>
+            <div className={`min-h-screen w-full flex items-center justify-center ${tColor('bg-gray-100', 'bg-black')} transition-colors duration-300 p-0 sm:p-4`}>
               <div 
-                className={`w-full max-w-sm h-[750px] max-h-screen relative overflow-hidden flex flex-col font-sans shadow-2xl transition-all duration-300 origin-center ${tColor('bg-white', 'bg-gray-900')}`}
+                className={`w-full h-screen sm:h-[85vh] sm:max-w-3xl sm:rounded-3xl relative overflow-hidden flex flex-col font-sans shadow-2xl transition-all duration-300 origin-center ${tColor('bg-white', 'bg-gray-900')}`}
                 style={{ transform: `scale(${settings.scale})` }}
               >
-                <header className={`px-4 py-3 flex justify-between items-center z-20 shadow-sm ${tColor('bg-white', 'bg-gray-800')}`}>
-                  <div className="flex items-center space-x-2">
-                    <AppLogo size="w-7 h-7" />
-                    <h1 className="font-extrabold text-lg tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 to-yellow-700">
+                <header className={`px-5 py-4 flex justify-between items-center z-20 shadow-sm ${tColor('bg-white', 'bg-gray-800')}`}>
+                  <div className="flex items-center space-x-2.5">
+                    <AppLogo size="w-8 h-8" />
+                    <h1 className="font-extrabold text-xl tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 to-yellow-700">
                       확률 뚫고 1등
                     </h1>
                   </div>
-                  <button onClick={() => setActiveTab('map')} className={`p-1.5 rounded-full transition ${activeTab === 'map' ? 'bg-yellow-100 text-yellow-700' : tColor('bg-gray-50 text-gray-400', 'bg-gray-700 text-gray-400')}`}>
+                  <button onClick={() => setActiveTab('map')} className={`p-2 rounded-full transition ${activeTab === 'map' ? 'bg-yellow-100 text-yellow-700' : tColor('bg-gray-50 text-gray-400', 'bg-gray-700 text-gray-400')}`}>
                     <MapIcon />
                   </button>
                 </header>
 
                 {toastMsg && (
-                  <div className="absolute top-14 left-1/2 transform -translate-x-1/2 w-[90%] z-50">
-                    <div className="bg-gray-800 text-white px-3 py-2 rounded-lg shadow-xl font-medium text-xs flex justify-center items-center animate-bounce">
+                  <div className="absolute top-16 left-1/2 transform -translate-x-1/2 w-[90%] max-w-md z-50">
+                    <div className="bg-gray-800 text-white px-4 py-2.5 rounded-xl shadow-xl font-medium text-xs flex justify-center items-center animate-bounce">
                       {toastMsg}
                     </div>
                   </div>
                 )}
 
                 <main className="flex-1 overflow-hidden relative">
-                  <div className="absolute inset-0 overflow-y-auto pb-20 custom-scrollbar">
+                  <div className="absolute inset-0 overflow-y-auto pb-24 custom-scrollbar">
                     {activeTab === 'home' && <HomeView />}
                     {activeTab === 'map' && <MapView />}
                     {activeTab === 'widgets' && <WidgetView />}
@@ -419,7 +419,7 @@
                   </div>
                 </main>
 
-                <nav className={`absolute bottom-0 w-full flex justify-around items-center px-2 pt-2 pb-6 z-30 shadow-[0_-5px_15px_rgba(0,0,0,0.05)] transition-colors duration-300 ${tColor(curNavColor.light, curNavColor.dark)}`}>
+                <nav className={`absolute bottom-0 w-full flex justify-around items-center px-4 pt-3 pb-6 z-30 shadow-[0_-5px_20px_rgba(0,0,0,0.06)] transition-colors duration-300 ${tColor(curNavColor.light, curNavColor.dark)}`}>
                   {[
                     { id: 'home', icon: <HomeIcon />, label: '홈' },
                     { id: 'map', icon: <MapIcon />, label: '지도' },
@@ -428,10 +428,10 @@
                   ].map(tab => (
                     <button 
                       key={tab.id} onClick={() => setActiveTab(tab.id)}
-                      className={`flex flex-col items-center p-1.5 min-w-[60px] transition-colors ${activeTab === tab.id ? tColor(curNavColor.textLight, curNavColor.textDark) : tColor(curNavColor.iconUnselectedLight, curNavColor.iconUnselectedDark)}`}
+                      className={`flex flex-col items-center p-1.5 min-w-[70px] transition-colors ${activeTab === tab.id ? tColor(curNavColor.textLight, curNavColor.textDark) : tColor(curNavColor.iconUnselectedLight, curNavColor.iconUnselectedDark)}`}
                     >
-                      <div className={activeTab === tab.id ? 'transform scale-110 mb-0.5' : 'mb-0.5'}>{tab.icon}</div>
-                      <span className="text-[9px] font-bold">{tab.label}</span>
+                      <div className={activeTab === tab.id ? 'transform scale-110 mb-1' : 'mb-1'}>{tab.icon}</div>
+                      <span className="text-[11px] font-bold">{tab.label}</span>
                     </button>
                   ))}
                 </nav>
