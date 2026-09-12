@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>확률 뚫고 1등</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- React & ReactDOM CDN -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .animate-fade-in { animation: fadeIn 0.2s ease-out forwards; }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .toggle-checkbox:checked { right: 0; border-color: #facc15; }
+        .toggle-checkbox:checked + .toggle-label { background-color: #facc15; }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        const MapIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>;
+        const HomeIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>;
+        const WidgetIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>;
+        const SettingsIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>;
+        const RefreshIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>;
+
+        const AppLogo = ({ size = "w-8 h-8" }) => (
+          <div className={`relative flex items-center justify-center rounded-xl bg-gradient-to-br from-yellow-300 via-yellow-500 to-yellow-600 shadow-md ${size}`}>
+            <span className="text-xl drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)] z-10">🍀</span>
+            <div className="absolute top-0 right-0 w-2 h-2 bg-white rounded-full opacity-70 animate-ping"></div>
+          </div>
+        );
+
+        const fallbackData = [
+          { id: 1, type: "스피또 2000", round: 69, price: 2000, remaining1st: 10, total1st: 10, remaining2nd: 25, stockRate: 61, color: "from-blue-500 to-blue-700", imgSrc: "https://dhlottery.co.kr/images/game/spitto/spitto2000.png" },
+          { id: 2, type: "스피또 2000", round: 68, price: 2000, remaining1st: 1, total1st: 4, remaining2nd: 3, stockRate: 100, color: "from-indigo-500 to-indigo-700", imgSrc: "https://dhlottery.co.kr/images/game/spitto/spitto2000.png" },
+          { id: 3, type: "스피또 1000", round: 109, price: 1000, remaining1st: 11, total1st: 12, remaining2nd: 45, stockRate: 45, color: "from-red-500 to-red-700", imgSrc: "https://dhlottery.co.kr/images/game/spitto/spitto1000.png" },
+          { id: 4, type: "스피또 1000", round: 108, price: 1000, remaining1st: 1, total1st: 12, remaining2nd: 2, stockRate: 100, color: "from-rose-500 to-rose-700", imgSrc: "https://dhlottery.co.kr/images/game/spitto/spitto1000.png" },
+          { id: 5, type: "스피또 500", round: 48, price: 500, remaining1st: 3, total1st: 4, remaining2nd: 10, stockRate: 52, color: "from-emerald-500 to-emerald-700", imgSrc: "https://dhlottery.co.kr/images/game/spitto/spitto500.png" },
+        ];
+
+        const NAV_COLORS = [
+          { id: 'sky', label: '하늘', light: 'bg-sky-100 border-sky-200', dark: 'bg-sky-900 border-sky-800', textLight: 'text-sky-700', textDark: 'text-sky-300', iconUnselectedLight: 'text-sky-500/70', iconUnselectedDark: 'text-sky-500' },
+          { id: 'pink', label: '핑크', light: 'bg-pink-100 border-pink-200', dark: 'bg-pink-900 border-pink-800', textLight: 'text-pink-700', textDark: 'text-pink-300', iconUnselectedLight: 'text-pink-500/70', iconUnselectedDark: 'text-pink-500' },
+          { id: 'green', label: '초록', light: 'bg-green-100 border-green-200', dark: 'bg-green-900 border-green-800', textLight: 'text-green-700', textDark: 'text-green-300', iconUnselectedLight: 'text-green-500/70', iconUnselectedDark: 'text-green-500' },
+          { id: 'purple', label: '보라', light: 'bg-purple-100 border-purple-200', dark: 'bg-purple-900 border-purple-800', textLight: 'text-purple-700', textDark: 'text-purple-300', iconUnselectedLight: 'text-purple-500/70', iconUnselectedDark: 'text-purple-500' },
+          { id: 'indigo', label: '남색', light: 'bg-indigo-100 border-indigo-200', dark: 'bg-indigo-900 border-indigo-800', textLight: 'text-indigo-700', textDark: 'text-indigo-300', iconUnselectedLight: 'text-indigo-500/70', iconUnselectedDark: 'text-indigo-500' },
+          { id: 'teal', label: '청록', light: 'bg-teal-100 border-teal-200', dark: 'bg-teal-900 border-teal-800', textLight: 'text-teal-700', textDark: 'text-teal-300', iconUnselectedLight: 'text-teal-500/70', iconUnselectedDark: 'text-teal-500' },
+          { id: 'orange', label: '주황', light: 'bg-orange-100 border-orange-200', dark: 'bg-orange-900 border-orange-800', textLight: 'text-orange-700', textDark: 'text-orange-300', iconUnselectedLight: 'text-orange-500/70', iconUnselectedDark: 'text-orange-500' },
+          { id: 'gray', label: '회색', light: 'bg-gray-100 border-gray-200', dark: 'bg-gray-900 border-gray-800', textLight: 'text-gray-700', textDark: 'text-gray-300', iconUnselectedLight: 'text-gray-500/70', iconUnselectedDark: 'text-gray-500' },
+        ];
+
+        const getLottoColor = (num) => {
+          if (num <= 10) return 'bg-yellow-500';
+          if (num <= 20) return 'bg-blue-500';
+          if (num <= 30) return 'bg-red-500';
+          if (num <= 40) return 'bg-gray-500';
+          return 'bg-green-500';
+        };
+
+        function App() {
+          const [activeTab, setActiveTab] = useState('home');
+          const [toastMsg, setToastMsg] = useState(null);
+          const [spittoData, setSpittoData] = useState(fallbackData);
+          const [isFetching, setIsFetching] = useState(false);
+          
+          const [settings, setSettings] = useState({
+            logicType: 'default',
+            notificationsEnabled: true,
+            theme: 'light',
+            scale: 0.9,
+            navColor: 'sky',
+            showLotto: false,
+          });
+
+          const [lottoData, setLottoData] = useState({ round: 1137, numbers: [4, 9, 12, 15, 33, 45], bonus: 26 });
+          const [mapLocation, setMapLocation] = useState('평택시');
+          const [searchLocation, setSearchLocation] = useState('');
+
+          const tColor = (lightColor, darkColor) => settings.theme === 'dark' ? darkColor : lightColor;
+
+          const calculateSignal = (item) => {
+            let score = 0;
+            if (settings.logicType === 'default') {
+              if (item.stockRate === 0) return 3;
+              const ratio = item.remaining1st / (item.stockRate / 100); 
+              if (ratio >= 15) score = 5; 
+              else if (ratio >= 10) score = 4;
+              else if (ratio >= 5) score = 3; 
+              else if (ratio >= 2) score = 2;
+              else score = 1;
+            } else if (settings.logicType === 'near80') {
+              if (item.stockRate >= 80 && item.stockRate <= 95 && item.remaining1st > 0) score = 5;
+              else if (item.stockRate > 95 && item.remaining1st > 0) score = 4;
+              else if (item.stockRate >= 70 && item.stockRate < 80) score = 3;
+              else if (item.stockRate < 70) score = 2;
+              else score = 1;
+            } else {
+              const remainingPercent = 100 - item.stockRate;
+              if (remainingPercent === 0 && item.remaining1st > 0) score = 5; 
+              else {
+                 const magicNumber = (item.remaining1st * 3 + item.remaining2nd) / (remainingPercent || 1);
+                 if (magicNumber >= 2.0) score = 5;
+                 else if (magicNumber >= 1.5) score = 4;
+                 else if (magicNumber >= 1.0) score = 3;
+                 else if (magicNumber >= 0.5) score = 2;
+                 else score = 1;
+              }
+            }
+            return score;
+          };
+
+          const getSignalMeta = (score) => {
+            switch(score) {
+              case 5: return { text: "적극매수", bg: "bg-green-500", textCol: "text-green-500", idx: 4 };
+              case 4: return { text: "살만함", bg: "bg-lime-400", textCol: "text-lime-500", idx: 3 };
+              case 3: return { text: "보통", bg: "bg-yellow-400", textCol: "text-yellow-500", idx: 2 };
+              case 2: return { text: "안삼", bg: "bg-orange-500", textCol: "text-orange-500", idx: 1 };
+              case 1: return { text: "절대사지말것", bg: "bg-red-600", textCol: "text-red-500", idx: 0 };
+              default: return { text: "알수없음", bg: "bg-gray-400", textCol: "text-gray-400", idx: 2 };
+            }
+          };
+
+          const showToast = (msg) => {
+            setToastMsg(msg);
+            setTimeout(() => setToastMsg(null), 3500);
+          };
+
+          const fetchRealData = async (isAuto = false) => {
+            const silent = isAuto === true;
+            setIsFetching(true);
+            try {
+              await new Promise(r => setTimeout(r, 1000));
+              setSpittoData(prev => prev.map(item => ({
+                ...item,
+                stockRate: Math.min(100, item.stockRate + Math.floor(Math.random() * 2))
+              })));
+              if (!silent) showToast("최신 동행복권 데이터 동기화 완료!");
+            } catch (e) {
+              if (!silent) showToast("데이터 동기화 실패 (네트워크 오류)");
+            } finally {
+              setIsFetching(false);
+            }
+          };
+
+          useEffect(() => {
+            fetchRealData(true);
+            const TWO_HOURS = 2 * 60 * 60 * 1000;
+            const interval = setInterval(() => {
+              fetchRealData(true);
+            }, TWO_HOURS);
+            return () => clearInterval(interval);
+          }, []);
+
+          const TrafficLight = ({ score }) => {
+            const meta = getSignalMeta(score);
+            const colors = ['bg-red-600', 'bg-orange-500', 'bg-yellow-400', 'bg-lime-400', 'bg-green-500'];
+            const activeColor = colors[meta.idx];
+            return (
+              <div className={`flex flex-col items-center justify-center p-1.5 rounded-lg border w-[72px] flex-shrink-0 ${tColor('border-gray-200 bg-gray-50', 'border-gray-700 bg-gray-800')}`}>
+                <div className={`w-4 h-4 rounded-full mb-1 ${activeColor} shadow-[0_0_8px_currentColor]`} />
+                <span className={`text-[10px] font-black ${meta.textCol} text-center leading-tight whitespace-nowrap`}>{meta.text}</span>
+              </div>
+            );
+          };
+
+          const SpittoCard = ({ item }) => {
+            const score = calculateSignal(item);
+            return (
+              <div className={`rounded-xl p-2.5 mb-2 flex items-center justify-between shadow-sm border ${tColor('bg-white border-gray-100', 'bg-gray-800 border-gray-700')}`}>
+                <div className={`relative w-12 h-14 rounded overflow-hidden flex-shrink-0 border ${tColor('border-gray-200 bg-gray-100', 'border-gray-700 bg-gray-800')}`}>
+                  <img 
+                    src={item.imgSrc} 
+                    alt={`${item.type} ${item.round}회`} 
+                    className="w-full h-full object-cover absolute inset-0 z-10"
+                    onError={(e) => { e.target.style.display = 'none'; }} 
+                  />
+                  <div className={`w-full h-full absolute inset-0 bg-gradient-to-br ${item.color} flex flex-col items-center justify-center text-white z-0`}>
+                    <span className="text-[8px] opacity-80 font-medium">{item.type}</span>
+                    <span className="text-sm font-black text-center leading-none mt-1">{item.round}</span>
+                  </div>
+                </div>
+                
+                <div className="flex-1 px-3 flex flex-col justify-center">
+                  <div className="flex items-start justify-between mb-1">
+                    <h3 className={`font-black text-sm tracking-tight ${tColor('text-gray-800', 'text-gray-100')}`}>
+                      {item.type} <span className="font-bold text-[10px] opacity-60 ml-1">{item.round}회</span>
+                    </h3>
+                    <div className="flex flex-col items-end">
+                      <span className="text-[10px] font-bold text-red-500">1등 {item.remaining1st}/{item.total1st}매</span>
+                      {settings.logicType === 'complex' && (
+                        <span className="text-[9px] font-bold text-blue-500">2등 {item.remaining2nd}매</span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-1.5 mb-1 dark:bg-gray-700">
+                    <div className="bg-blue-500 h-1.5 rounded-full transition-all duration-500" style={{ width: `${item.stockRate}%` }}></div>
+                  </div>
+                  <p className={`text-[10px] text-right ${tColor('text-gray-500', 'text-gray-400')}`}>입고율 <strong className={tColor('text-gray-800', 'text-gray-200')}>{item.stockRate}%</strong></p>
+                </div>
+
+                <TrafficLight score={score} />
+              </div>
+            );
+          };
+
+          const HomeView = () => (
+            <div className="p-3 animate-fade-in h-full flex flex-col">
+              <div className="flex justify-between items-center mb-3">
+                <div>
+                  <h2 className={`text-lg font-black tracking-tight ${tColor('text-gray-800', 'text-white')}`}>현재 스피또 상태</h2>
+                </div>
+                <button onClick={() => fetchRealData(false)} className={`p-1.5 rounded-md flex items-center text-xs font-bold ${isFetching ? 'animate-pulse' : ''} ${tColor('bg-blue-50 text-blue-600', 'bg-blue-900/30 text-blue-400')}`}>
+                  <RefreshIcon /><span className="ml-1">동기화</span>
+                </button>
+              </div>
+
+              <div className={`flex justify-between items-center p-2 rounded-lg mb-3 border text-[9px] font-bold ${tColor('bg-gray-50 border-gray-200 text-gray-600', 'bg-gray-800 border-gray-700 text-gray-300')}`}>
+                <span className="text-red-500">● 1:절대안삼</span>
+                <span className="text-orange-500">● 2:안삼</span>
+                <span className="text-yellow-500">● 3:보통</span>
+                <span className="text-lime-500">● 4:살만함</span>
+                <span className="text-green-500">● 5:적극매수</span>
+              </div>
+              
+              <div className="flex-1 overflow-y-auto pr-1 custom-scrollbar">
+                {spittoData.map(item => <SpittoCard key={item.id} item={item} />)}
+                
+                {settings.showLotto && (
+                  <div className={`mt-4 mb-2 p-3 rounded-xl border shadow-sm flex flex-col items-center ${tColor('bg-white border-gray-100', 'bg-gray-800 border-gray-700')}`}>
+                    <div className="flex items-center space-x-2 mb-3">
+                      <span className={`text-xs font-bold ${tColor('text-gray-500', 'text-gray-400')}`}>동행복권 1등 당첨결과</span>
+                      <span className={`text-sm font-black ${tColor('text-blue-600', 'text-blue-400')}`}>{lottoData.round}회</span>
+                    </div>
+                    <div className="flex space-x-1.5 items-center">
+                      {lottoData.numbers.map((n, i) => (
+                        <div key={i} className={`w-7 h-7 rounded-full text-white font-bold flex justify-center items-center text-[11px] shadow-md ${getLottoColor(n)}`}>
+                          {n}
+                        </div>
+                      ))}
+                      <span className={`text-lg font-bold mx-1 ${tColor('text-gray-400', 'text-gray-600')}`}>+</span>
+                      <div className={`w-7 h-7 rounded-full text-white font-bold flex justify-center items-center text-[11px] shadow-md ${getLottoColor(lottoData.bonus)}`}>
+                        {lottoData.bonus}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+
+          const SettingsView = () => (
+            <div className={`p-4 animate-fade-in h-full ${tColor('bg-gray-50', 'bg-gray-900')}`}>
+              <h2 className={`text-lg font-black mb-4 ${tColor('text-gray-800', 'text-white')}`}>앱 설정</h2>
+              
+              <div className={`rounded-xl shadow-sm border p-3 mb-4 space-y-4 ${tColor('bg-white border-gray-100', 'bg-gray-800 border-gray-700')}`}>
+                <div className="flex justify-between items-center">
+                  <span className={`text-sm font-bold ${tColor('text-gray-800', 'text-gray-200')}`}>다크 모드 (블랙 테마)</span>
+                  <input type="checkbox" className="toggle-checkbox" checked={settings.theme === 'dark'} onChange={() => setSettings({...settings, theme: settings.theme === 'dark' ? 'light' : 'dark'})} />
+                </div>
+                
+                <div>
+                  <div className="flex justify-between mb-1">
+                    <span className={`text-sm font-bold ${tColor('text-gray-800', 'text-gray-200')}`}>화면 크기 (비율)</span>
+                    <span className={`text-xs font-bold ${tColor('text-blue-600', 'text-blue-400')}`}>{Math.round(settings.scale * 100)}%</span>
+                  </div>
+                  <input 
+                    type="range" min="0.75" max="1.1" step="0.05" 
+                    value={settings.scale}
+                    onChange={(e) => setSettings({...settings, scale: parseFloat(e.target.value)})}
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+                  />
+                </div>
+              </div>
+
+              <h3 className={`text-xs font-bold mb-2 ml-1 ${tColor('text-gray-500', 'text-gray-400')}`}>화면 및 기타 설정</h3>
+              <div className={`rounded-xl shadow-sm border p-3 mb-4 space-y-4 ${tColor('bg-white border-gray-100', 'bg-gray-800 border-gray-700')}`}>
+                <div>
+                  <span className={`text-sm font-bold block mb-2 ${tColor('text-gray-800', 'text-gray-200')}`}>하단 네비게이션 색상</span>
+                  <div className="flex flex-wrap gap-2">
+                    {NAV_COLORS.map(c => (
+                      <button 
+                        key={c.id} 
+                        onClick={() => setSettings({...settings, navColor: c.id})} 
+                        className={`w-7 h-7 rounded-full shadow-sm flex justify-center items-center ${c.light.split(' ')[0]} ${settings.navColor === c.id ? 'ring-2 ring-offset-1 ' + tColor('ring-gray-800', 'ring-gray-300') : ''}`}
+                        title={c.label}
+                      >
+                        {settings.navColor === c.id && <span className={`${tColor(c.textLight, c.textDark)} text-[10px] font-black`}>✓</span>}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className={`h-px w-full ${tColor('bg-gray-100', 'bg-gray-700')}`}></div>
+
+                <div className="flex justify-between items-center">
+                  <div className="flex flex-col">
+                    <span className={`text-sm font-bold ${tColor('text-gray-800', 'text-gray-200')}`}>로또 1등 번호 표시</span>
+                    <span className={`text-[10px] mt-0.5 ${tColor('text-gray-500', 'text-gray-400')}`}>홈 화면 하단에 최근 로또 추첨결과 표시</span>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" className="sr-only peer" checked={settings.showLotto} onChange={() => setSettings({...settings, showLotto: !settings.showLotto})} />
+                    <div className={`w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all ${settings.showLotto ? 'bg-yellow-400 dark:bg-yellow-500' : ''}`}></div>
+                  </label>
+                </div>
+              </div>
+
+              <h3 className={`text-xs font-bold mb-2 ml-1 ${tColor('text-gray-500', 'text-gray-400')}`}>신호등 로직 설정</h3>
+              <div className={`rounded-xl shadow-sm border overflow-hidden text-sm ${tColor('bg-white border-gray-100', 'bg-gray-800 border-gray-700')}`}>
+                {[
+                  { id: 'default', title: '기본 로직 (권장)', desc: '남은장수/판매입고율 공식 적용' },
+                  { id: 'near80', title: '입고율 임박 로직', desc: '입고율 80~90% 근접 시 가점 부여' },
+                  { id: 'complex', title: '복합 확률 로직', desc: '2등 잔여수량과 전체 확률 종합 계산' }
+                ].map(logic => (
+                  <label key={logic.id} className={`flex items-start p-3 border-b cursor-pointer transition ${tColor('border-gray-50 hover:bg-gray-50', 'border-gray-700 hover:bg-gray-700')}`}>
+                    <input type="radio" name="logic" className="mt-1" checked={settings.logicType === logic.id} onChange={() => setSettings({...settings, logicType: logic.id})} />
+                    <div className="ml-3">
+                      <h4 className={`font-bold ${tColor('text-gray-800', 'text-gray-200')}`}>{logic.title}</h4>
+                      <p className={`text-[10px] mt-0.5 ${tColor('text-gray-500', 'text-gray-400')}`}>{logic.desc}</p>
+                    </div>
+                  </label>
+                ))}
+              </div>
+            </div>
+          );
+
+          const MapView = () => (
+            <div className="flex flex-col h-full animate-fade-in relative">
+              <div className={`p-3 shadow-sm z-10 flex space-x-2 ${tColor('bg-white', 'bg-gray-800')}`}>
+                <input type="text" placeholder="지역 설정 (예: 강남구)" className={`flex-1 border-none rounded-lg px-3 py-2 text-sm outline-none ${tColor('bg-gray-100 text-gray-800', 'bg-gray-700 text-white')}`} value={searchLocation} onChange={(e) => setSearchLocation(e.target.value)} />
+                <button onClick={() => { setMapLocation(searchLocation || mapLocation); showToast(`'${searchLocation || mapLocation}' 주변 검색 완료`); }} className={`px-3 rounded-lg font-bold text-xs transition ${tColor('bg-gray-800 text-white', 'bg-gray-600 text-white')}`}>검색</button>
+              </div>
+              <div className={`flex-1 relative overflow-hidden flex items-center justify-center ${tColor('bg-blue-50', 'bg-blue-900/20')}`}>
+                <p className={`text-sm font-bold opacity-50 ${tColor('text-blue-800', 'text-blue-300')}`}>{mapLocation} 주변 판매점 지도 (목업)</p>
+                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-3xl">🍀</div>
+              </div>
+            </div>
+          );
+
+          const WidgetView = () => (
+            <div className={`p-4 h-full animate-fade-in ${tColor('bg-gray-50', 'bg-gray-900')}`}>
+              <h2 className={`text-lg font-black mb-4 ${tColor('text-gray-800', 'text-white')}`}>위젯 미리보기</h2>
+              <div className="flex flex-col space-y-4">
+                <div className={`w-32 h-32 rounded-3xl shadow-lg border p-4 flex flex-col justify-between ${tColor('bg-white border-gray-100', 'bg-gray-800 border-gray-700')}`}>
+                   <div className="flex justify-between items-start">
+                     <AppLogo size="w-8 h-8" />
+                     <TrafficLight score={calculateSignal(spittoData[0])} />
+                   </div>
+                   <div>
+                     <p className={`text-[10px] font-bold ${tColor('text-gray-500', 'text-gray-400')}`}>추천 복권</p>
+                     <p className={`text-xs font-black leading-tight mt-0.5 ${tColor('text-gray-800', 'text-white')}`}>스피또 2000<br/>69회차</p>
+                   </div>
+                </div>
+                
+                <div className={`w-full h-24 rounded-3xl shadow-lg border p-4 flex justify-between items-center ${tColor('bg-white border-gray-100', 'bg-gray-800 border-gray-700')}`}>
+                   <div className="flex flex-col justify-center h-full">
+                     <div className="flex items-center space-x-2 mb-1">
+                       <AppLogo size="w-6 h-6" />
+                       <span className={`text-[10px] font-bold ${tColor('text-gray-500', 'text-gray-400')}`}>확률 뚫고 1등</span>
+                     </div>
+                     <p className={`text-sm font-black mt-1 ${tColor('text-gray-800', 'text-white')}`}>오늘의 추천 복권</p>
+                   </div>
+                   
+                   <div className={`flex items-center rounded-xl p-2 border ${tColor('bg-gray-50 border-gray-100', 'bg-gray-700/50 border-gray-600')}`}>
+                     <div className="mr-3 text-right">
+                        <p className={`text-[11px] font-black ${tColor('text-gray-800', 'text-white')}`}>{spittoData[0].type}</p>
+                        <p className={`text-[10px] ${tColor('text-gray-500', 'text-gray-400')}`}>{spittoData[0].round}회</p>
+                     </div>
+                     <TrafficLight score={calculateSignal(spittoData[0])} />
+                   </div>
+                </div>
+              </div>
+            </div>
+          );
+
+          const curNavColor = NAV_COLORS.find(c => c.id === settings.navColor) || NAV_COLORS[0];
+
+          return (
+            <div className={`min-h-screen w-full flex items-center justify-center ${tColor('bg-gray-200', 'bg-black')} transition-colors duration-300`}>
+              <div 
+                className={`w-full max-w-sm h-[750px] max-h-screen relative overflow-hidden flex flex-col font-sans shadow-2xl transition-all duration-300 origin-center ${tColor('bg-white', 'bg-gray-900')}`}
+                style={{ transform: `scale(${settings.scale})` }}
+              >
+                <header className={`px-4 py-3 flex justify-between items-center z-20 shadow-sm ${tColor('bg-white', 'bg-gray-800')}`}>
+                  <div className="flex items-center space-x-2">
+                    <AppLogo size="w-7 h-7" />
+                    <h1 className="font-extrabold text-lg tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 to-yellow-700">
+                      확률 뚫고 1등
+                    </h1>
+                  </div>
+                  <button onClick={() => setActiveTab('map')} className={`p-1.5 rounded-full transition ${activeTab === 'map' ? 'bg-yellow-100 text-yellow-700' : tColor('bg-gray-50 text-gray-400', 'bg-gray-700 text-gray-400')}`}>
+                    <MapIcon />
+                  </button>
+                </header>
+
+                {toastMsg && (
+                  <div className="absolute top-14 left-1/2 transform -translate-x-1/2 w-[90%] z-50">
+                    <div className="bg-gray-800 text-white px-3 py-2 rounded-lg shadow-xl font-medium text-xs flex justify-center items-center animate-bounce">
+                      {toastMsg}
+                    </div>
+                  </div>
+                )}
+
+                <main className="flex-1 overflow-hidden relative">
+                  <div className="absolute inset-0 overflow-y-auto pb-20 custom-scrollbar">
+                    {activeTab === 'home' && <HomeView />}
+                    {activeTab === 'map' && <MapView />}
+                    {activeTab === 'widgets' && <WidgetView />}
+                    {activeTab === 'settings' && <SettingsView />}
+                  </div>
+                </main>
+
+                <nav className={`absolute bottom-0 w-full flex justify-around items-center px-2 pt-2 pb-6 z-30 shadow-[0_-5px_15px_rgba(0,0,0,0.05)] transition-colors duration-300 ${tColor(curNavColor.light, curNavColor.dark)}`}>
+                  {[
+                    { id: 'home', icon: <HomeIcon />, label: '홈' },
+                    { id: 'map', icon: <MapIcon />, label: '지도' },
+                    { id: 'widgets', icon: <WidgetIcon />, label: '위젯' },
+                    { id: 'settings', icon: <SettingsIcon />, label: '설정' },
+                  ].map(tab => (
+                    <button 
+                      key={tab.id} onClick={() => setActiveTab(tab.id)}
+                      className={`flex flex-col items-center p-1.5 min-w-[60px] transition-colors ${activeTab === tab.id ? tColor(curNavColor.textLight, curNavColor.textDark) : tColor(curNavColor.iconUnselectedLight, curNavColor.iconUnselectedDark)}`}
+                    >
+                      <div className={activeTab === tab.id ? 'transform scale-110 mb-0.5' : 'mb-0.5'}>{tab.icon}</div>
+                      <span className="text-[9px] font-bold">{tab.label}</span>
+                    </button>
+                  ))}
+                </nav>
+              </div>
+            </div>
+          );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
